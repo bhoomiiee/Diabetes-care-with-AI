@@ -18,7 +18,6 @@ A comprehensive web-based platform for diabetes risk assessment, health data vis
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
 - [Contributing](#contributing)
-- [Troubleshooting](#troubleshooting)
 - [License](#license)
 
 ---
@@ -387,7 +386,8 @@ curl http://localhost:5000/api/posts
 
 We welcome contributions from developers of all skill levels.
 
-Follow the Code Of Conduct: **[CODE_OF_CONDUCT.md](.CODE_OF_CONDUCT.md)** 
+Follow the Code Of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) 
+
 ---
 
 ## License
