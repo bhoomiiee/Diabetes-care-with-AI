@@ -1,101 +1,650 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Diabetes Care Forum</title>
+  <title>{{ _('Diabetes Care Forum') }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
+
     .fade-in {
-      animation: fadeIn 0.5s ease-out forwards;
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .post-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .post-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 25px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-primary {
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      background-color: #2563eb;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .notification-dropdown {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .notification-item:hover {
+      background-color: #f3f4f6;
+    }
+
+    .notification-unread {
+      background-color: #eff6ff;
+      border-left: 3px solid #3b82f6;
+    }
+
+    .modal-overlay {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .toast {
+      animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 4.7s forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+
+      to {
+        opacity: 0;
+      }
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-white text-gray-800 min-h-screen flex flex-col font-sans">
 
-  <header class="bg-blue-700 text-white p-6 shadow-md">
-    <div class="container mx-auto text-center">
-      <h1 class="text-4xl font-extrabold tracking-wide">🩺 Diabetes Care Forum</h1>
-      <p class="text-blue-100 text-sm mt-2">Share your journey. Ask questions. Support each other.</p>
+<body class="bg-gradient-to-br from-blue-50 to-white text-gray-800 min-h-screen flex flex-col font-sans">
+  <header class="bg-blue-700 text-white shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center py-5 px-6">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide">🩺 {{ _('Diabetes Care') }}</h1>
+
+      <div class="flex items-center gap-4">
+        <!-- Desktop Nav -->
+        <nav class="hidden md:block">
+          <ul class="flex space-x-4 md:space-x-6 text-lg font-semibold">
+            <li><a href="/index" class="hover:text-blue-300 transition">Prediction</a></li>
+            <li><a href="/life" class="hover:text-blue-300 transition">Lifestyle Check</a></li>
+            <li><a href="/chatbot" class="hover:text-blue-300 transition">Chatbot</a></li>
+            <li><a href="/explore" class="hover:text-blue-300 transition">Explore Data</a></li>
+            <li><a href="/forum" class="hover:text-blue-300 transition font-bold">Forum</a></li>
+          </ul>
+        </nav>
+
+        <!-- Notification Bell -->
+        <div class="relative">
+          <button id="notificationBell" class="relative p-2 hover:bg-blue-600 rounded-full transition" type="button">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+              </path>
+            </svg>
+            <span id="notificationBadge"
+              class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">0</span>
+          </button>
+          <div id="notificationDropdown"
+            class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+              <h3 class="font-semibold text-gray-800" id="notif-heading">{{ _('Notifications') }}</h3>
+              <div class="flex gap-2">
+                <button id="markAllRead" class="text-xs text-blue-600 hover:text-blue-800" type="button">Mark all
+                  read</button>
+                <button id="openSettings" class="text-gray-500 hover:text-gray-700" type="button">⚙️</button>
+              </div>
+            </div>
+            <div id="notificationList" class="notification-dropdown">
+              <p class="p-4 text-gray-500 text-center text-sm">No notifications yet</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Hamburger Button -->
+        <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden bg-blue-800 border-t border-blue-600">
+      <ul class="flex flex-col space-y-2 p-4 text-lg font-semibold">
+        <li><a href="/index" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Prediction</a></li>
+        <li><a href="/life" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Lifestyle Check</a></li>
+        <li><a href="/chatbot" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Chatbot</a></li>
+        <li><a href="/explore" class="block py-2 px-4 hover:bg-blue-700 rounded transition">Explore Data</a></li>
+        <li><a href="/forum" class="block py-2 px-4 hover:bg-blue-700 rounded transition font-bold">Forum</a></li>
+      </ul>
     </div>
   </header>
 
+  <section class="bg-blue-700 text-white py-12">
+    <div class="container mx-auto text-center">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide">{{ _('Diabetes Care Forum') }}</h1>
+      <p class="text-blue-100 text-base mt-2">{{ _('Share experiences, ask questions, and support the community.') }}</p>
+    </div>
+  </section>
   <main class="flex-grow container mx-auto px-6 py-10 max-w-3xl">
-    <!-- New Post Form -->
-    <section class="mb-12 bg-white p-6 rounded-xl shadow-lg border border-blue-100">
-      <h2 class="text-2xl font-semibold mb-4 text-blue-700">Share Your Experience or Ask a Question</h2>
+    <section class="mb-8 bg-white p-8 rounded-2xl shadow-xl border border-blue-100">
+      <h2 class="text-2xl font-semibold mb-4 text-blue-700">{{ _('Share Your Story or Ask a Question') }}</h2>
       <form id="postForm" class="flex flex-col gap-4">
-        <textarea id="postContent" rows="4" class="p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 shadow-sm transition" placeholder="Type your story or question here..."></textarea>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white py-2 px-6 rounded-full font-semibold shadow-lg self-start">
-          ➕ Post
-        </button>
+        <textarea id="postContent" rows="4"
+          class="p-5 border border-gray-300 rounded-2xl resize-none focus:outline-none focus:ring-4 focus:ring-blue-300 placeholder-gray-400 shadow-sm"
+          placeholder="Type your story or question here... Use @username to mention someone"></textarea>
+        <div class="flex justify-between items-center">
+          <button type="submit"
+            class="btn-primary bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full font-semibold shadow-lg">➕
+            Post</button>
+          <span class="text-gray-500 text-sm" id="charCount">0/500</span>
+        </div>
       </form>
     </section>
-
-    <!-- Posts List -->
-    <section id="postsList" class="space-y-6">
-      <!-- Posts will appear here -->
+    <section class="mb-8 bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">{{ _('Search & Filter Posts') }}</h3>
+      <div class="mb-4">
+        <div class="relative">
+          <input type="text" id="searchInput"
+            class="w-full p-4 pl-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
+            placeholder="Search posts by keyword...">
+          <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div><label for="startDate" class="block text-sm font-medium text-gray-600 mb-1">From Date</label><input
+            type="date" id="startDate"
+            class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+        <div><label for="endDate" class="block text-sm font-medium text-gray-600 mb-1">To Date</label><input type="date"
+            id="endDate"
+            class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+      </div>
+      <div class="flex justify-between items-center">
+        <button id="clearFilters" type="button"
+          class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1 transition">✕ Clear
+          Filters</button>
+        <div id="activeFilters" class="text-sm text-gray-500"></div>
+      </div>
+      <div id="dateError" class="hidden mt-2 text-red-500 text-sm"></div>
     </section>
+    <div id="loadingIndicator" class="hidden flex justify-center items-center py-8">
+      <div class="spinner"></div><span class="ml-3 text-gray-500">Loading posts...</span>
+    </div>
+    <section id="postsList" class="space-y-6"></section>
+    <div id="noPosts" class="text-center text-gray-400 text-lg hidden mt-6">📝 No posts yet — be the first to share!
+    </div>
+    <div id="noResults" class="hidden text-center py-8">
+      <p class="text-gray-500 text-lg mb-2">🔍 No posts found matching your search.</p><button
+        id="clearFiltersFromNoResults" type="button" class="text-blue-600 hover:text-blue-800 font-medium">Clear filters
+        and show all posts</button>
+    </div>
+    <div id="paginationControls" class="hidden mt-8 flex justify-center items-center gap-4">
+      <button id="prevPage" type="button"
+        class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition">←
+        Previous</button>
+      <span id="pageInfo" class="text-gray-600 font-medium">Page 1 of 1</span>
+      <button id="nextPage" type="button"
+        class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition">Next
+        →</button>
+    </div>
   </main>
+  <footer class="bg-blue-50 text-center text-gray-500 text-sm py-4 border-t mt-8">© {{ current_year }} Diabetes Care Forum. Empowering lives, one post at a time.</footer>
 
-  <footer class="bg-blue-50 text-center text-gray-500 text-sm py-4 border-t">
-    © 2025 Diabetes Care Forum. Empowering lives, one post at a time.
-  </footer>
+  <!-- Toast Notification Container with ARIA live region -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
+  <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div class="modal-overlay absolute inset-0" onclick="closeSettingsModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 z-10">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-800">Notification Settings</h2>
+        <button onclick="closeSettingsModal()" type="button"
+          class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+      </div>
+      <div class="mb-6 p-4 bg-blue-50 rounded-xl">
+        <h3 class="font-semibold text-gray-700 mb-3">{{ _('Your Profile') }}</h3>
+        <div class="space-y-3">
+          <div><label class="block text-sm text-gray-600 mb-1">Username</label><input type="text" id="settingsUsername"
+              class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              placeholder="Enter username"></div>
+          <div><label class="block text-sm text-gray-600 mb-1">Email (for notifications)</label><input type="email"
+              id="settingsEmail"
+              class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              placeholder="your@email.com"></div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <h3 class="font-semibold text-gray-700">Email Notifications</h3>
+        <label class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+          <div><span class="font-medium text-gray-700">Replies to my posts</span>
+            <p class="text-sm text-gray-500">Get notified when someone replies</p>
+          </div><input type="checkbox" id="prefReplies" class="w-5 h-5 text-blue-600 rounded" checked>
+        </label>
+        <label class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+          <div><span class="font-medium text-gray-700">Mentions (@username)</span>
+            <p class="text-sm text-gray-500">Get notified when you're mentioned</p>
+          </div><input type="checkbox" id="prefMentions" class="w-5 h-5 text-blue-600 rounded" checked>
+        </label>
+        <label class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+          <div><span class="font-medium text-gray-700">Subscribed threads</span>
+            <p class="text-sm text-gray-500">Updates on threads you follow</p>
+          </div><input type="checkbox" id="prefSubscriptions" class="w-5 h-5 text-blue-600 rounded" checked>
+        </label>
+      </div>
+      <button id="saveSettings" type="button"
+        class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">Save
+        Settings</button>
+    </div>
+  </div>
   <script>
-    const postForm = document.getElementById('postForm');
-    const postContent = document.getElementById('postContent');
-    const postsList = document.getElementById('postsList');
+    const $ = id => document.getElementById(id);
+    const postForm = $('postForm'), postContent = $('postContent'), postsList = $('postsList');
+    const noPosts = $('noPosts'), noResults = $('noResults'), charCount = $('charCount');
+    const searchInput = $('searchInput'), startDate = $('startDate'), endDate = $('endDate');
+    const clearFiltersBtn = $('clearFilters'), clearFiltersFromNoResultsBtn = $('clearFiltersFromNoResults');
+    const activeFiltersDisplay = $('activeFilters'), dateError = $('dateError');
+    const loadingIndicator = $('loadingIndicator'), paginationControls = $('paginationControls');
+    const prevPageBtn = $('prevPage'), nextPageBtn = $('nextPage'), pageInfo = $('pageInfo');
+    const notificationBell = $('notificationBell'), notificationBadge = $('notificationBadge');
+    const notificationDropdown = $('notificationDropdown'), notificationList = $('notificationList');
+    const markAllReadBtn = $('markAllRead'), openSettingsBtn = $('openSettings'),
+          settingsModal = $('settingsModal'), saveSettingsBtn = $('saveSettings');
 
-    async function fetchPosts() {
+    let currentUser = JSON.parse(localStorage.getItem('forumUser')) || null;
+    const filterState = { search: '', startDate: null, endDate: null, page: 1, perPage: 10 };
+
+    function getOrCreateUserId() {
+      let userId = localStorage.getItem('forumUserId');
+      if (!userId) { userId = 'user_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('forumUserId', userId); }
+      return userId;
+    }
+
+    function toggleNotificationDropdown(e) {
+      e.stopPropagation();
+      const isHidden = notificationDropdown.classList.toggle('hidden');
+      notificationBell.setAttribute('aria-expanded', !isHidden);
+    }
+
+    function openSettingsModal() {
+      loadUserPreferences();
+      settingsModal.classList.remove('hidden');
+      notificationDropdown.classList.add('hidden');
+    }
+
+    function closeSettingsModal() { settingsModal.classList.add('hidden'); }
+
+    async function initUser() { if (currentUser) { loadUserPreferences(); fetchNotifications(); } }
+
+    async function registerUser(username, email) {
+      const userId = getOrCreateUserId();
       try {
-        const res = await fetch('/api/posts');
-        const posts = await res.json();
-        postsList.innerHTML = '';
-        posts.forEach(post => {
-          const postEl = document.createElement('article');
-          postEl.className = 'p-5 bg-white rounded-xl shadow-md border border-gray-200 fade-in';
-          postEl.innerHTML = `
-            <p class="mb-3 whitespace-pre-line text-gray-700 leading-relaxed">${post.content}</p>
-            <small class="text-gray-500 text-sm">🕒 Posted at ${new Date(post.timestamp).toLocaleString()}</small>
-          `;
-          postsList.appendChild(postEl);
-        });
-      } catch (err) {
-        postsList.innerHTML = `<p class="text-red-500">Failed to load posts.</p>`;
+        const res = await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId, username, email }) });
+        if (res.ok) { const data = await res.json(); currentUser = { userId, username, email, ...data.user }; localStorage.setItem('forumUser', JSON.stringify(currentUser)); return true; }
+      } catch (err) { console.error('Failed to register:', err); }
+      return false;
+    }
+
+    function loadUserPreferences() {
+      if (currentUser) {
+        $('settingsUsername').value = currentUser.username || '';
+        $('settingsEmail').value = currentUser.email || '';
+        const prefs = currentUser.preferences || {};
+        $('prefReplies').checked = prefs.email_replies !== false;
+        $('prefMentions').checked = prefs.email_mentions !== false;
+        $('prefSubscriptions').checked = prefs.email_subscriptions !== false;
       }
     }
+
+    async function saveUserPreferences() {
+      const username = $('settingsUsername').value.trim();
+      const email = $('settingsEmail').value.trim();
+      if (!username || !email) { alert('Please enter both username and email'); return; }
+      await registerUser(username, email);
+      const userId = getOrCreateUserId();
+      const prefs = { email_replies: $('prefReplies').checked, email_mentions: $('prefMentions').checked, email_subscriptions: $('prefSubscriptions').checked };
+      try {
+        await fetch('/api/users/' + userId + '/preferences', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(prefs) });
+        if (currentUser) { currentUser.preferences = prefs; localStorage.setItem('forumUser', JSON.stringify(currentUser)); }
+        closeSettingsModal(); alert('Settings saved!');
+      } catch (err) { console.error('Failed to save:', err); }
+    }
+
+    async function fetchNotifications() {
+      if (!currentUser) return;
+      try {
+        const res = await fetch('/api/notifications/' + getOrCreateUserId());
+        if (res.ok) {
+          const data = await res.json();
+
+          // Check for new notifications and show toast (skip first fetch)
+          if (data.notifications && !isFirstFetch) {
+            data.notifications.forEach(n => {
+              if (!seenNotificationIds.has(n.id)) {
+                showToast(n.message, n.type);
+              }
+            });
+          }
+
+          // Update seen IDs
+          if (data.notifications) {
+            data.notifications.forEach(n => seenNotificationIds.add(n.id));
+          }
+
+          isFirstFetch = false;
+          renderNotifications(data.notifications);
+          updateNotificationBadge(data.unread_count);
+        }
+      } catch (err) { console.error('Notifications error:', err); }
+    }
+
+    function renderNotifications(notifs) {
+      if (!notifs || notifs.length === 0) { notificationList.innerHTML = '<p class="p-4 text-gray-500 text-center text-sm" role="listitem">No notifications yet</p>'; return; }
+      notificationList.innerHTML = notifs.map(n => {
+        const icon = n.type === 'reply' ? '[Reply]' : n.type === 'mention' ? '[Mention]' : '[Notification]';
+        const time = new Date(n.timestamp).toLocaleString();
+        const postId = n.post_id || 'null';
+        const unreadLabel = n.read ? '' : ' (unread)';
+        return '<div class="notification-item p-3 border-b border-gray-100 cursor-pointer ' + (n.read ? '' : 'notification-unread') + '" role="listitem" tabindex="0" onclick="handleNotificationClick(' + n.id + ', ' + postId + ')" onkeypress="if(event.key===\'Enter\')handleNotificationClick(' + n.id + ', ' + postId + ')"><div class="flex items-start gap-3"><span class="text-xl" aria-hidden="true">' + icon + '</span><div class="flex-1"><p class="text-sm text-gray-800">' + n.message + unreadLabel + '</p><p class="text-xs text-gray-400 mt-1">' + time + '</p></div></div></div>';
+      }).join('');
+    }
+
+    function updateNotificationBadge(count) {
+      if (count > 0) { 
+        const countText = count > 99 ? '99+' : count;
+        notificationBadge.textContent = countText; 
+        notificationBadge.setAttribute('aria-label', countText + ' unread notifications');
+        notificationBadge.classList.remove('hidden'); 
+      }
+      else { notificationBadge.classList.add('hidden'); }
+    }
+
+    // Track seen notification IDs to detect new ones
+    let seenNotificationIds = new Set();
+    let isFirstFetch = true;
+
+    function showToast(message, type) {
+      const toastContainer = document.getElementById('toastContainer');
+      const icon = type === 'mention' ? '[Mention]' : type === 'reply' ? '[Reply]' : '[Notification]';
+      const toast = document.createElement('div');
+      toast.className = 'toast bg-white rounded-lg shadow-lg border border-gray-200 p-4 flex items-start gap-3 max-w-sm cursor-pointer hover:bg-gray-50';
+      toast.setAttribute('role', 'alert');
+      toast.innerHTML = '<span class="text-2xl" aria-hidden="true">' + icon + '</span><div><p class="font-medium text-gray-800">New Notification</p><p class="text-sm text-gray-600">' + message + '</p></div><button class="ml-auto text-gray-400 hover:text-gray-600" aria-label="Dismiss notification">&times;</button>';
+      toast.onclick = () => { notificationDropdown.classList.remove('hidden'); toast.remove(); };
+      toast.querySelector('button').onclick = (e) => { e.stopPropagation(); toast.remove(); };
+      toastContainer.appendChild(toast);
+
+      // Play sound (optional)
+      try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Coverage').play().catch(() => { }); } catch (e) { }
+
+      setTimeout(() => toast.remove(), 5000);
+    }
+
+    async function handleNotificationClick(notifId, postId) {
+      // Delete the notification
+      await fetch('/api/notifications/' + getOrCreateUserId() + '/read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notification_ids: [notifId] }) });
+
+      // Refresh notifications to update badge and list
+      fetchNotifications();
+      notificationDropdown.classList.add('hidden');
+
+      // Scroll to the post if postId exists
+      if (postId) {
+        const postEl = document.querySelector('[data-post-id="' + postId + '"]');
+        if (postEl) {
+          postEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          postEl.classList.add('ring-4', 'ring-blue-400');
+          setTimeout(() => postEl.classList.remove('ring-4', 'ring-blue-400'), 3000);
+        }
+      }
+    }
+
+    async function markAllNotificationsRead() {
+      await fetch('/api/notifications/' + getOrCreateUserId() + '/read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_all: true }) });
+      // Clear the notification list visually
+      notificationList.innerHTML = '<p class="p-4 text-gray-500 text-center text-sm">No notifications yet</p>';
+      updateNotificationBadge(0);
+    }
+
+    async function subscribeToPost(postId) {
+      if (!currentUser) { openSettingsModal(); alert('Please set up your profile first'); return; }
+      await fetch('/api/users/' + getOrCreateUserId() + '/subscribe/' + postId, { method: 'POST' });
+      alert('You are now following this thread!');
+    }
+
+    let replyingToPostId = null;
+
+    function replyToPost(postId) {
+      replyingToPostId = postId;
+      postContent.placeholder = 'Write your reply...';
+      postContent.focus();
+      // Show reply indicator
+      const indicator = document.createElement('div');
+      indicator.id = 'replyIndicator';
+      indicator.className = 'mb-2 p-2 bg-blue-100 rounded-lg text-sm text-blue-700 flex justify-between items-center';
+      indicator.innerHTML = '<span>Replying to post #' + postId + '</span><button onclick="cancelReply()" type="button" class="text-blue-500 hover:text-blue-700">Cancel</button>';
+      const existing = document.getElementById('replyIndicator');
+      if (existing) existing.remove();
+      postContent.parentElement.insertBefore(indicator, postContent);
+    }
+
+    function cancelReply() {
+      replyingToPostId = null;
+      postContent.placeholder = 'Type your story or question here... Use @username to mention someone';
+      const indicator = document.getElementById('replyIndicator');
+      if (indicator) indicator.remove();
+    }
+
+    function debounce(func, wait) { let timeout; return function (...args) { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); }; }
+
+    function buildQueryString() {
+      const params = new URLSearchParams();
+      if (filterState.search) params.append('search', filterState.search);
+      if (filterState.startDate) params.append('start_date', filterState.startDate);
+      if (filterState.endDate) params.append('end_date', filterState.endDate);
+      params.append('page', filterState.page);
+      params.append('per_page', filterState.perPage);
+      return params.toString();
+    }
+
+    function validateDateRange() {
+      if (filterState.startDate && filterState.endDate && filterState.startDate > filterState.endDate) {
+        dateError.textContent = 'Start date must be before or equal to end date';
+        dateError.classList.remove('hidden');
+        return false;
+      }
+      dateError.classList.add('hidden');
+      return true;
+    }
+
+    function updateActiveFiltersDisplay() {
+      const filters = [];
+      if (filterState.search) filters.push('Search: "' + filterState.search + '"');
+      if (filterState.startDate) filters.push('From: ' + filterState.startDate);
+      if (filterState.endDate) filters.push('To: ' + filterState.endDate);
+      activeFiltersDisplay.textContent = filters.length > 0 ? filters.join(' | ') : '';
+    }
+
+    function setLoading(isLoading) {
+      loadingIndicator.classList.toggle('hidden', !isLoading);
+      postsList.classList.toggle('opacity-50', isLoading);
+    }
+
+    function updatePagination(pagination) {
+      const { page, total_pages, total } = pagination;
+      if (total === 0 || total_pages <= 1) { paginationControls.classList.add('hidden'); return; }
+      paginationControls.classList.remove('hidden');
+      pageInfo.textContent = 'Page ' + page + ' of ' + total_pages;
+      prevPageBtn.disabled = page <= 1;
+      nextPageBtn.disabled = page >= total_pages;
+    }
+
+    function escapeRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    function clearFilters() {
+      filterState.search = ''; filterState.startDate = null; filterState.endDate = null; filterState.page = 1;
+      searchInput.value = ''; startDate.value = ''; endDate.value = '';
+      dateError.classList.add('hidden');
+      fetchPosts();
+    }
+
+    async function fetchPosts() {
+      if (!validateDateRange()) return;
+      setLoading(true);
+      updateActiveFiltersDisplay();
+      announceToScreenReader('Loading posts...');
+      try {
+        const res = await fetch('/api/posts?' + buildQueryString());
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to fetch posts');
+        const { posts, pagination } = data;
+        postsList.innerHTML = '';
+        noPosts.classList.add('hidden');
+        noResults.classList.add('hidden');
+        if (posts.length === 0) {
+          const hasFilters = filterState.search || filterState.startDate || filterState.endDate;
+          (hasFilters ? noResults : noPosts).classList.remove('hidden');
+          paginationControls.classList.add('hidden');
+          announceToScreenReader(hasFilters ? 'No posts found matching your search.' : 'No posts yet.');
+          return;
+        }
+        posts.forEach((post, index) => {
+          const time = new Date(post.timestamp).toLocaleString();
+          const postEl = document.createElement('article');
+          postEl.className = "post-card p-6 bg-white rounded-2xl shadow-md border border-gray-100 fade-in transition-all duration-300";
+          postEl.setAttribute('data-post-id', post.id);
+          postEl.setAttribute('aria-posinset', index + 1);
+          postEl.setAttribute('aria-setsize', posts.length);
+          let content = post.content;
+          if (filterState.search) {
+            const regex = new RegExp('(' + escapeRegex(filterState.search) + ')', 'gi');
+            content = content.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+          }
+          content = content.replace(/@(\w+)/g, '<span class="text-blue-600 font-medium">@$1</span>');
+          postEl.innerHTML = '<p class="text-gray-800 leading-relaxed text-lg whitespace-pre-line">' + content + '</p><div class="mt-4 flex justify-between items-center"><span class="text-sm text-gray-500">' + time + '</span><div class="flex gap-3"><button onclick="replyToPost(' + post.id + ')" type="button" class="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1" aria-label="Reply to this post">Reply</button><button onclick="subscribeToPost(' + post.id + ')" type="button" class="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1" aria-label="Follow this thread">Follow</button></div></div>';
+          postsList.appendChild(postEl);
+        });
+        updatePagination(pagination);
+        announceToScreenReader('Loaded ' + posts.length + ' posts. Page ' + pagination.page + ' of ' + pagination.total_pages + '.');
+      } catch (err) {
+        postsList.innerHTML = '<p class="text-red-500" role="alert">Failed to load posts: ' + err.message + '</p>';
+        announceToScreenReader('Error loading posts: ' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Event Listeners
+    postContent.addEventListener('input', () => { charCount.textContent = postContent.value.length + '/500'; });
+    const debouncedSearch = debounce(() => { filterState.search = searchInput.value.trim(); filterState.page = 1; fetchPosts(); }, 300);
+    searchInput.addEventListener('input', debouncedSearch);
+    startDate.addEventListener('change', () => { filterState.startDate = startDate.value || null; filterState.page = 1; fetchPosts(); });
+    endDate.addEventListener('change', () => { filterState.endDate = endDate.value || null; filterState.page = 1; fetchPosts(); });
+    clearFiltersBtn.addEventListener('click', clearFilters);
+    clearFiltersFromNoResultsBtn.addEventListener('click', clearFilters);
+    prevPageBtn.addEventListener('click', () => { if (filterState.page > 1) { filterState.page--; fetchPosts(); } });
+    nextPageBtn.addEventListener('click', () => { filterState.page++; fetchPosts(); });
+
+    notificationBell.addEventListener('click', toggleNotificationDropdown);
+    markAllReadBtn.addEventListener('click', markAllNotificationsRead);
+    openSettingsBtn.addEventListener('click', openSettingsModal);
+    saveSettingsBtn.addEventListener('click', saveUserPreferences);
+
+    document.addEventListener('click', (e) => {
+      if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
+        notificationDropdown.classList.add('hidden');
+      }
+    });
 
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const content = postContent.value.trim();
-      if (!content) {
-        alert('Please write something before posting.');
-        return;
-      }
+      if (!content) return;
       try {
-        const res = await fetch('/api/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content })
-        });
-        if (res.ok) {
-          postContent.value = '';
-          fetchPosts();
-        } else {
-          const error = await res.json();
-          alert(error.error || 'Failed to post.');
-        }
-      } catch {
-        alert('Server error. Please try again.');
+        announceToScreenReader('Posting your message...');
+        const res = await fetch('/api/posts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, author_id: currentUser ? getOrCreateUserId() : 'anonymous', parent_id: replyingToPostId }) });
+        if (!res.ok) throw new Error((await res.json()).error || 'Failed to create post');
+        postContent.value = '';
+        charCount.textContent = '0/500';
+        cancelReply();
+        announceToScreenReader('Your post was published successfully.');
+        fetchPosts();
+      } catch (err) { 
+        announceToScreenReader('Error: ' + err.message);
+        alert('Failed to create post: ' + err.message); 
       }
     });
 
+    // Initialize
+    initUser();
     fetchPosts();
+    setInterval(fetchNotifications, 5000); // Poll every 5 seconds for faster notifications
+
+    // Mobile menu toggle
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileBtn && mobileMenu) {
+      mobileBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
   </script>
 </body>
+
 </html>

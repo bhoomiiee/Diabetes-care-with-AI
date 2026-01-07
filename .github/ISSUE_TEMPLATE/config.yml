@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://github.com/Anshika09Singh/Diabetes-care-with-AI/discussions
+    about: Ask questions in Discussions instead of opening an issue
