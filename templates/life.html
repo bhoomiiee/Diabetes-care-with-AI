@@ -1,32 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{ _('Personalized Lifestyle Plan') }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <script>
+    // Apply dark mode before page renders to prevent flash
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
   <style>
-    /* --- Navbar Improvement Section --- */
-    .navbar {
-      background-color: #1d4ed8; 
-      color: white;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      padding: 0.75rem 0;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
     }
-
-    .navbar-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 1.5rem;
+    .dark .glass-card {
+      background: rgba(30, 41, 59, 0.95);
     }
 
     .navbar-title {
@@ -91,34 +88,34 @@
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex flex-col">
+<body class="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 min-h-screen flex flex-col transition-colors duration-300">
 
   {% include 'navbar.html' %}
 
   <main class="flex-grow flex items-center justify-center p-6">
-    <div class="max-w-2xl w-full bg-white/30 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20">
-      <h2 class="text-3xl font-extrabold mb-6 text-center text-blue-800 tracking-wide">🌿 {{ _('Personalized Lifestyle Plan') }}
+    <div class="max-w-2xl w-full bg-white/30 dark:bg-slate-800/50 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-slate-700">
+      <h2 class="text-3xl font-extrabold mb-6 text-center text-blue-800 dark:text-blue-400 tracking-wide">🌿 {{ _('Personalized Lifestyle Plan') }}
       </h2>
 
       <form id="planForm" class="space-y-5">
         <div>
-          <label for="age" class="block font-semibold mb-1 text-gray-700">{{ _('Age') }}</label>
+          <label for="age" class="block font-semibold mb-1 text-gray-700 dark:text-gray-300">{{ _('Age') }}</label>
           <input type="number" id="age" name="age" min="1" max="120" placeholder="{{ _('Enter your age') }}"
             inputmode="numeric" autocomplete="age"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
             required />
         </div>
 
         <div>
-          <label for="weight" class="block font-semibold mb-1 text-gray-700">{{ _('Weight (kg)') }}</label>
+          <label for="weight" class="block font-semibold mb-1 text-gray-700 dark:text-gray-300">{{ _('Weight (kg)') }}</label>
           <input type="number" id="weight" name="weight" min="1" max="500" step="0.1" placeholder="{{ _('Enter your weight in kg') }}"
             inputmode="decimal" autocomplete="weight"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            class="w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
             required />
         </div>
 
         <div>
-          <label for="height" class="block font-semibold mb-1 text-gray-700">{{ _('Height (cm)') }}</label>
+          <label for="height" class="block font-semibold mb-1 text-gray-700 dark:text-gray-300">{{ _('Height (cm)') }}</label>
           <input type="number" id="height" name="height" min="30" max="300" step="0.1" placeholder="{{ _('Enter your height in cm') }}"
             inputmode="decimal" autocomplete="height"
             class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth"></html>
+<html lang="en" class="scroll-smooth">
 
 <head>
   <meta charset="UTF-8" />
@@ -7,6 +7,17 @@
   <title>{{ _('Diabetes Care Home') }}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <script>
+    // Apply dark mode before page renders to prevent flash
+    (function() {
+      var savedTheme = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
   <style>
     .gradient-bg {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
@@ -15,6 +26,10 @@
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark .glass-card {
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .feature-card {
       transition: all 0.3s ease;
@@ -412,98 +427,103 @@
     <div class="max-w-7xl mx-auto px-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         <div class="p-4">
+  <!-- Stats Section -->
+  <section class="py-12 bg-white dark:bg-slate-800 border-b dark:border-slate-700 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div class="p-4">
           <p class="text-4xl font-extrabold stat-counter">95%</p>
-          <p class="text-gray-600 mt-2">{{ _('Prediction Accuracy') }}</p>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">{{ _('Prediction Accuracy') }}</p>
         </div>
         <div class="p-4">
           <p class="text-4xl font-extrabold stat-counter">24/7</p>
-          <p class="text-gray-600 mt-2">{{ _('AI Chatbot Support') }}</p>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">{{ _('AI Chatbot Support') }}</p>
         </div>
         <div class="p-4">
           <p class="text-4xl font-extrabold stat-counter">5+</p>
-          <p class="text-gray-600 mt-2">{{ _('Languages Supported') }}</p>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">{{ _('Languages Supported') }}</p>
         </div>
         <div class="p-4">
           <p class="text-4xl font-extrabold stat-counter">100%</p>
-          <p class="text-gray-600 mt-2">{{ _('Free & Open Source') }}</p>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">{{ _('Free & Open Source') }}</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Features Section -->
-  <section class="py-20 bg-gray-50">
+  <section class="py-20 bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">{{ _('Powerful Features') }}</h2>
-        <p class="text-gray-600 max-w-2xl mx-auto">{{ _('Everything you need to manage and understand diabetes better') }}</p>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">{{ _('Powerful Features') }}</h2>
+        <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">{{ _('Everything you need to manage and understand diabetes better') }}</p>
       </div>
       
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Prediction Card -->
         <a href="/index" class="feature-card glass-card rounded-2xl p-8 block">
-          <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ _('Diabetes Prediction') }}</h3>
-          <p class="text-gray-600">{{ _('Get instant AI-powered predictions based on your health metrics with high accuracy.') }}</p>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ _('Diabetes Prediction') }}</h3>
+          <p class="text-gray-600 dark:text-gray-400">{{ _('Get instant AI-powered predictions based on your health metrics with high accuracy.') }}</p>
         </a>
 
         <!-- Lifestyle Card -->
         <a href="/life" class="feature-card glass-card rounded-2xl p-8 block">
-          <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ _('Lifestyle Check') }}</h3>
-          <p class="text-gray-600">{{ _('Analyze your daily habits and get personalized recommendations for a healthier life.') }}</p>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ _('Lifestyle Check') }}</h3>
+          <p class="text-gray-600 dark:text-gray-400">{{ _('Analyze your daily habits and get personalized recommendations for a healthier life.') }}</p>
         </a>
 
         <!-- Chatbot Card -->
         <a href="/chatbot" class="feature-card glass-card rounded-2xl p-8 block">
-          <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ _('AI Chatbot') }}</h3>
-          <p class="text-gray-600">{{ _('Chat with our intelligent assistant for instant answers to your diabetes questions.') }}</p>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ _('AI Chatbot') }}</h3>
+          <p class="text-gray-600 dark:text-gray-400">{{ _('Chat with our intelligent assistant for instant answers to your diabetes questions.') }}</p>
         </a>
 
         <!-- Explore Card -->
         <a href="/explore" class="feature-card glass-card rounded-2xl p-8 block">
-          <div class="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ _('Explore Data') }}</h3>
-          <p class="text-gray-600">{{ _('Visualize and analyze diabetes datasets with interactive charts and insights.') }}</p>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ _('Explore Data') }}</h3>
+          <p class="text-gray-600 dark:text-gray-400">{{ _('Visualize and analyze diabetes datasets with interactive charts and insights.') }}</p>
         </a>
 
         <!-- Forum Card -->
         <a href="/forum" class="feature-card glass-card rounded-2xl p-8 block">
-          <div class="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-14 h-14 bg-red-100 dark:bg-red-900/50 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ _('Community Forum') }}</h3>
-          <p class="text-gray-600">{{ _('Connect with others, share experiences, and support the diabetes care community.') }}</p>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ _('Community Forum') }}</h3>
+          <p class="text-gray-600 dark:text-gray-400">{{ _('Connect with others, share experiences, and support the diabetes care community.') }}</p>
         </a>
 
         <!-- Multi-language Card -->
         <div class="feature-card glass-card rounded-2xl p-8">
-          <div class="w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-14 h-14 bg-yellow-100 dark:bg-yellow-900/50 rounded-xl flex items-center justify-center mb-6">
+            <svg class="w-7 h-7 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ _('Multi-Language') }}</h3>
-          <p class="text-gray-600">{{ _('Available in English, Spanish, French, Hindi, and Chinese for global accessibility.') }}</p>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ _('Multi-Language') }}</h3>
+          <p class="text-gray-600 dark:text-gray-400">{{ _('Available in English, Spanish, French, Hindi, and Chinese for global accessibility.') }}</p>
         </div>
       </div>
     </div>

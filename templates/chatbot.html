@@ -1,27 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ _('Diabetes Chatbot') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script>
+      // Apply dark mode before page renders to prevent flash
+      (function() {
+        var savedTheme = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background: linear-gradient(135deg, #4a90e2, #50e3c2);
             min-height: 100vh;
-            color: #333;
         }
-
-        .navbar {
-            background-color: #1d4ed8;
-            color: #ffffff;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.95);
         }
 
         .navbar-inner {
@@ -196,23 +203,23 @@
 
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
 
     {% include 'navbar.html' %}
 
     <main class="flex-grow flex justify-center items-center p-5">
-        <div class="chat-container">
-            <div class="chat-header">
+        <div class="chat-container dark:bg-slate-800/90 dark:border-slate-700">
+            <div class="chat-header dark:bg-slate-700">
                 {{ _('Diabetes Expert Chatbot') }}
             </div>
-            <div class="chat-messages" id="chat-messages">
+            <div class="chat-messages dark:bg-slate-900" id="chat-messages">
                 <div class="message bot">
-                    <div class="message-bubble">Hello! I'm here to help you understand diabetes and answer your
+                    <div class="message-bubble dark:bg-slate-700 dark:text-gray-200">Hello! I'm here to help you understand diabetes and answer your
                         questions. How can I assist you today?</div>
                 </div>
             </div>
-            <div class="chat-input">
-                <input type="text" id="user-input" placeholder="{{ _('Type your message...') }}">
+            <div class="chat-input dark:bg-slate-800 dark:border-slate-700">
+                <input type="text" id="user-input" placeholder="{{ _('Type your message...') }}" class="dark:bg-slate-700 dark:text-white dark:border-slate-600">
                 <button onclick="sendMessage()">{{ _('Send') }}</button>
             </div>
         </div>
