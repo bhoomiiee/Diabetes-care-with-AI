@@ -99,12 +99,11 @@
           </button>
           
           <!-- Get Started Button -->
-          <a href="/index" class="hidden sm:block bg-white text-blue-700 dark:bg-cyan-400 dark:text-slate-900 px-4 py-2 rounded-full font-bold hover:scale-105 transition">
-            {{ _('Get Started') }}
-          </a>
+          <button id="getStartedBtn" class="hidden sm:block bg-white text-blue-700 dark:bg-cyan-400 dark:text-slate-900 px-4 py-2 rounded-full font-bold hover:scale-105 transition">
+            Get Started
+          </button>
         </div>
       </div>
-      <button class="btn-primary"><a href="/signup">Get Started</a></button>
     </div>
   </nav>
 
@@ -332,5 +331,17 @@ function toggleMobileMenu() {
   document.getElementById("nav-menu").classList.toggle("active");
 }
 </script>
+  <script>
+    // Wait until HTML is fully loaded
+    document.addEventListener("DOMContentLoaded", function () {
+      const getStartedBtn = document.getElementById("getStartedBtn");
+
+      // Attach click event
+      getStartedBtn.addEventListener("click", function () {
+        // Redirect to another page
+        window.location.href = "getStarted.html";
+      });
+    });
+  </script>
 </body>
 </html>
