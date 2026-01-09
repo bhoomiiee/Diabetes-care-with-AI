@@ -14,7 +14,7 @@ import threading
 from datetime import datetime, timezone
 
 # ✅ Correct Gemini import
-import google.generativeai as genai
+from google import genai
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -157,9 +157,9 @@ def get_gemini_response(user_message):
             logging.error("GEMINI_API_KEY not set.")
             return "Error: Gemini API Key not found."
 
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.5-flash")
-
+#genai.configure(api_key=api_key)
+       # model = genai.GenerativeModel("gemini-2.5-flash")
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         chat = model.start_chat(history=[
             {"role": "user", "parts": ["You're a helpful diabetes assistant."]}
         ])
@@ -447,15 +447,24 @@ def generate_fallback_plan(age, bmi, bmi_category, activity, age_group):
 
 
 @app.route('/generate', methods=['POST'])
-def chat_gemini():
-    data = request.get_json()
-    if not data or not data.get('message'):
-        return jsonify({'reply': "Please provide a message."}), 400
+def generate():
+    try:
+        user_input = request.json.get('message')
+        if not user_input:
+            return jsonify({'reply': "Please say something!"})
 
-    user_message = data['message']
-    bot_response = get_gemini_response(user_message)
-    return jsonify({'reply': bot_response})
-
+        # --- NEW CODE START ---
+        response = client.models.generate_content(
+            model='gemini-2.0-flash', # Or 'gemini-1.5-flash'
+            contents=user_input
+        )
+        reply_text = response.text
+        # --- NEW CODE END ---
+        
+        return jsonify({'reply': reply_text})
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'reply': "Sorry, I'm having trouble connecting to the AI right now."})
 
 # --- Forum Backend ---
 
