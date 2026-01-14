@@ -10,8 +10,14 @@
   .lang-dropdown.show {
     display: block;
   }
+  .theme-toggle {
+    transition: transform 0.3s ease;
+  }
+  .theme-toggle:hover {
+    transform: rotate(15deg);
+  }
 </style>
-<header class="bg-blue-700 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
+<header class="bg-blue-700 dark:bg-slate-800 text-white shadow-lg fixed top-0 left-0 right-0 z-50 transition-colors duration-300">
   <div class="container mx-auto flex justify-between items-center py-4 px-6">
     <a href="/" class="text-2xl sm:text-3xl font-extrabold tracking-wide text-white dc-text-3d hover:opacity-90 transition">
       🩺 {{ _('Diabetes Care') }}
@@ -27,12 +33,25 @@
           <li><a href="/chatbot" class="hover:text-blue-300 transition">{{ _('Chatbot') }}</a></li>
           <li><a href="/explore" class="hover:text-blue-300 transition">{{ _('Explore') }}</a></li>
           <li><a href="/forum" class="hover:text-blue-300 transition">{{ _('Forum') }}</a></li>
+          <li><a href="/">Logout</a></li>
         </ul>
       </nav>
       
+      <!-- Dark Mode Toggle -->
+      <button id="theme-toggle" onclick="toggleTheme()" class="theme-toggle p-2 rounded-lg hover:bg-blue-600 dark:hover:bg-slate-700 transition" aria-label="{{ _('Toggle dark mode') }}">
+        <!-- Sun icon (shown in dark mode) -->
+        <svg id="theme-icon-light" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <!-- Moon icon (shown in light mode) -->
+        <svg id="theme-icon-dark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+      
       <!-- Language Selector -->
       <div class="relative">
-        <button onclick="toggleLangDropdown(event)" class="flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-blue-600 transition text-sm border border-blue-500" aria-label="{{ _('Select language') }}">
+        <button onclick="toggleLangDropdown(event)" class="flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-slate-700 transition text-sm border border-blue-500 dark:border-slate-600" aria-label="{{ _('Select language') }}">
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
           </svg>
@@ -41,10 +60,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
           </svg>
         </button>
-        <div id="lang-dropdown" class="lang-dropdown absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl z-[100] overflow-hidden">
+        <div id="lang-dropdown" class="lang-dropdown absolute right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-[100] overflow-hidden">
           {% for code, name in languages.items() %}
           <button onclick="setLanguage('{{ code }}')" 
-                  class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-100 text-sm {% if code == current_language %}bg-blue-50 font-semibold text-blue-700{% endif %} transition">
+                  class="block w-full text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-slate-700 text-sm {% if code == current_language %}bg-blue-50 dark:bg-slate-700 font-semibold text-blue-700 dark:text-blue-400{% endif %} transition">
             {{ name }}
           </button>
           {% endfor %}
@@ -61,15 +80,27 @@
   </div>
 
   <!-- Mobile Menu Drawer -->
-  <div id="mobile-menu" class="hidden md:hidden bg-blue-800 border-t border-blue-600">
+  <div id="mobile-menu" class="hidden md:hidden bg-blue-800 dark:bg-slate-900 border-t border-blue-600 dark:border-slate-700">
     <ul class="flex flex-col p-4 text-base font-semibold space-y-1">
-      <li><a href="/" class="block py-3 px-4 hover:bg-blue-700 rounded-lg transition">{{ _('Home') }}</a></li>
-      <li><a href="/index" class="block py-3 px-4 hover:bg-blue-700 rounded-lg transition">{{ _('Prediction') }}</a></li>
-      <li><a href="/life" class="block py-3 px-4 hover:bg-blue-700 rounded-lg transition">{{ _('Lifestyle') }}</a></li>
-      <li><a href="/chatbot" class="block py-3 px-4 hover:bg-blue-700 rounded-lg transition">{{ _('Chatbot') }}</a></li>
-      <li><a href="/explore" class="block py-3 px-4 hover:bg-blue-700 rounded-lg transition">{{ _('Explore') }}</a></li>
-      <li><a href="/forum" class="block py-3 px-4 hover:bg-blue-700 rounded-lg transition">{{ _('Forum') }}</a></li>
+      <li><a href="/" class="block py-3 px-4 hover:bg-blue-700 dark:hover:bg-slate-800 rounded-lg transition">{{ _('Home') }}</a></li>
+      <li><a href="/index" class="block py-3 px-4 hover:bg-blue-700 dark:hover:bg-slate-800 rounded-lg transition">{{ _('Prediction') }}</a></li>
+      <li><a href="/life" class="block py-3 px-4 hover:bg-blue-700 dark:hover:bg-slate-800 rounded-lg transition">{{ _('Lifestyle') }}</a></li>
+      <li><a href="/chatbot" class="block py-3 px-4 hover:bg-blue-700 dark:hover:bg-slate-800 rounded-lg transition">{{ _('Chatbot') }}</a></li>
+      <li><a href="/explore" class="block py-3 px-4 hover:bg-blue-700 dark:hover:bg-slate-800 rounded-lg transition">{{ _('Explore') }}</a></li>
+      <li><a href="/forum" class="block py-3 px-4 hover:bg-blue-700 dark:hover:bg-slate-800 rounded-lg transition">{{ _('Forum') }}</a></li>
     </ul>
+    <!-- Mobile Theme Toggle -->
+    <div class="px-4 pb-2 border-t border-blue-700 dark:border-slate-700 pt-2">
+      <button onclick="toggleTheme()" class="flex items-center gap-2 py-2 px-4 hover:bg-blue-700 dark:hover:bg-slate-800 rounded-lg transition w-full">
+        <svg id="mobile-theme-icon-light" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg id="mobile-theme-icon-dark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+        <span id="theme-text">{{ _('Dark Mode') }}</span>
+      </button>
+    </div>
     <!-- Mobile Language Selector -->
     <div class="px-4 pb-4 pt-2 border-t border-blue-700">
       <p class="text-blue-300 text-sm mb-2">{{ _('Language') }}</p>
@@ -89,6 +120,68 @@
 <div class="h-16 md:h-[72px]" aria-hidden="true"></div>
 
 <script>
+  // Dark mode initialization and toggle
+  (function() {
+    // Check saved preference or system preference
+    var savedTheme = localStorage.getItem('theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    
+    // Apply theme immediately
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+    
+    // Update icons after DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      updateThemeIcons();
+    });
+  })();
+  
+  function toggleTheme() {
+    var isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    updateThemeIcons();
+    
+    // Announce to screen readers
+    var message = isDark ? 'Dark mode enabled' : 'Light mode enabled';
+    announceThemeChange(message);
+  }
+  
+  function updateThemeIcons() {
+    var isDark = document.documentElement.classList.contains('dark');
+    
+    // Desktop icons
+    var lightIcon = document.getElementById('theme-icon-light');
+    var darkIcon = document.getElementById('theme-icon-dark');
+    if (lightIcon && darkIcon) {
+      lightIcon.classList.toggle('hidden', !isDark);
+      darkIcon.classList.toggle('hidden', isDark);
+    }
+    
+    // Mobile icons
+    var mobileLightIcon = document.getElementById('mobile-theme-icon-light');
+    var mobileDarkIcon = document.getElementById('mobile-theme-icon-dark');
+    var themeText = document.getElementById('theme-text');
+    if (mobileLightIcon && mobileDarkIcon) {
+      mobileLightIcon.classList.toggle('hidden', !isDark);
+      mobileDarkIcon.classList.toggle('hidden', isDark);
+    }
+    if (themeText) {
+      themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+    }
+  }
+  
+  function announceThemeChange(message) {
+    var announcement = document.createElement('div');
+    announcement.setAttribute('role', 'status');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.className = 'sr-only';
+    announcement.textContent = message;
+    document.body.appendChild(announcement);
+    setTimeout(function() { announcement.remove(); }, 1000);
+  }
+
   // Toggle language dropdown
   function toggleLangDropdown(e) {
     e.stopPropagation();
