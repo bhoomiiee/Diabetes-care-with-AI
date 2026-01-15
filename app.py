@@ -8,8 +8,12 @@ import sys
 import threading
 import joblib
 import json
+import warnings
 from datetime import datetime, timezone
 from config import Config
+
+# Suppress scikit-learn version warnings
+warnings.filterwarnings('ignore', category=UserWarning, module='sklearn')
 # --- External Libraries ---
 import matplotlib.pyplot as plt
 import numpy as np
@@ -169,11 +173,14 @@ except Exception as e:
 
 # --- Gemini AI Client Initialization (Fix #112) ---
 try:
-    if not app.config["GEMINI_API_KEY"]:
-          raise RuntimeError("GEMINI_API_KEY not set")
-    client = genai.Client(api_key = app.config["GEMINI_API_KEY"])
+    if app.config.get("GEMINI_API_KEY") and app.config["GEMINI_API_KEY"] != "your_gemini_api_key_here":
+        client = genai.Client(api_key = app.config["GEMINI_API_KEY"])
+        logging.info("Gemini Client initialized successfully.")
+    else:
+        client = None
+        logging.warning("Gemini API Key not configured. Chatbot features will be limited.")
 except Exception as e:
-    logging.error(f"Failed to initialize Gemini Client: {e}")
+    logging.warning(f"Gemini Client initialization skipped: {e}")
     client = None
 
 def get_gemini_response(user_message):
