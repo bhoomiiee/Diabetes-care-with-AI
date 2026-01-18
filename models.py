@@ -1,54 +1,72 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime, timezone
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Initialize the database
 db = SQLAlchemy()
 
-# ----------------------------
-# 1. NEW: User Model (For Auth)
-# ----------------------------
-class User(db.Model, UserMixin):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
-    # Relationships
-    # Link to predictions (One User -> Many Predictions)
-    predictions = db.relationship('Prediction', backref='author', lazy=True)
+    # Relationship to predictions
+    predictions = db.relationship('PredictionHistory', backref='user', lazy=True, cascade='all, delete-orphan')
     
-    # (Optional) Future-proofing: You can link posts to users later
-    # posts = db.relationship('Post', backref='writer', lazy=True)
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "created_at": self.created_at.isoformat() + 'Z'
+        }
 
-    def __repr__(self):
-        return f"User('{self.username}', '{self.email}')"
-
-# ----------------------------
-# 2. NEW: Prediction Model (For History)
-# ----------------------------
-class Prediction(db.Model):
+class PredictionHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    # Store the input data to show in history
-    glucose = db.Column(db.Integer, nullable=False)
-    bmi = db.Column(db.Float, nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-    
-    # Store the result ("Diabetic" / "Not Diabetic")
-    result = db.Column(db.String(20), nullable=False)
-    
-    # Date of prediction
-    date_posted = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
-    
-    # Foreign Key: Links this prediction to a specific User
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Input features
+    pregnancies = db.Column(db.Integer)
+    glucose = db.Column(db.Float)
+    blood_pressure = db.Column(db.Float)
+    skin_thickness = db.Column(db.Float)
+    insulin = db.Column(db.Float)
+    bmi = db.Column(db.Float)
+    dpf = db.Column(db.Float)
+    age = db.Column(db.Integer)
+    
+    # Prediction result
+    prediction = db.Column(db.Integer)  # 0 = Not Diabetic, 1 = Diabetic
+    risk_score = db.Column(db.Float, nullable=True)  # Optional probability score
+    
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "pregnancies": self.pregnancies,
+            "glucose": self.glucose,
+            "blood_pressure": self.blood_pressure,
+            "skin_thickness": self.skin_thickness,
+            "insulin": self.insulin,
+            "bmi": self.bmi,
+            "dpf": self.dpf,
+            "age": self.age,
+            "prediction": self.prediction,
+            "risk_score": self.risk_score,
+            "timestamp": self.timestamp.isoformat() + 'Z'
+        }
 
-    def __repr__(self):
-        return f"Prediction('{self.result}', '{self.date_posted}')"
-
-# ----------------------------
-# 3. EXISTING: Post Model (Forum)
-# ----------------------------
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
