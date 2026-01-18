@@ -1,8 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# This is the 'db' object app.py is trying to import
+# Initialize the database
 db = SQLAlchemy()
 
 class User(db.Model):
@@ -70,6 +71,8 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     topic = db.Column(db.String(50))
+    # Note: Currently author_id is a String (e.g., 'anonymous'). 
+    # In a future L2 update, we can change this to a ForeignKey linking to User.id
     author_id = db.Column(db.String(50), default='anonymous')
     parent_id = db.Column(db.Integer, nullable=True)
     timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
